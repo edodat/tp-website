@@ -20,4 +20,4 @@ var express = require('express'),
 // WEB SERVER CONFIGURATION
 require('./config/express.js')(app, express);
 
-server.listen(80);
+server.listen(process.env.PORT || 80);
