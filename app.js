@@ -20,4 +20,6 @@ var express = require('express'),
 // WEB SERVER CONFIGURATION
 require('./config/express.js')(app, express);
 
-server.listen(process.env.PORT || 80);
+server.listen(process.env.PORT || 80, function(){
+    console.log("Server listening on port " + (process.env.PORT || 80));
+});
