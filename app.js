@@ -16,10 +16,21 @@ var express = require('express'),
     http = require('http'),
     app = express();
 
-// WEB SERVER CONFIGURATION
+///////////////////
+// CONFIGURATION //
+///////////////////
+
 require('./config/express.js')(app, express);
+
+////////////
+// ROUTES //
+////////////
+
+//////////////////
+// START SERVER //
+//////////////////
 
 var server = http.createServer(app);
 server.listen(process.env.PORT || 80, function(){
-    console.log("Server listening on port " + server.address().port);
+    console.log('Server listening on port ' + server.address().port);
 });
