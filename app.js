@@ -16,6 +16,10 @@ var express = require('express'),
     http = require('http'),
     app = express();
 
+var bus = require('./controllers/bus.js');
+
+var controllers = require('./controllers');
+
 ///////////////////
 // CONFIGURATION //
 ///////////////////
@@ -25,6 +29,17 @@ require('./config/express.js')(app, express);
 ////////////
 // ROUTES //
 ////////////
+
+app.post('/companies', controllers.companies.register);
+
+
+///////////////////////////
+// SERVICE BUS LISTENERS //
+///////////////////////////
+
+bus.initialize(function(){
+});
+
 
 //////////////////
 // START SERVER //
