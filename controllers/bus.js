@@ -17,7 +17,7 @@ var amqp = require('amqp'),
 /////////////
 
 var connection;
-var registrationExchange;
+var adminExchange;
 var queue;
 var listeners = {};
 
@@ -31,8 +31,8 @@ function initialize (callback){
     connection.on('ready', function() {
         console.log('[BUS] Connected to ' + connection.serverProperties.product);
 
-        // declare "registration" AMQP exchange
-        registrationExchange = connection.exchange('registration', {
+        // declare "administration" AMQP exchange
+        adminExchange = connection.exchange('administration', {
             type: 'topic',
             durable: 'true'
         });
@@ -62,7 +62,7 @@ function initialize (callback){
  */
 function publish (routingKey, message){
     console.log('[BUS] Publishing', routingKey, 'message:', message);
-    registrationExchange.publish(routingKey, message);
+    adminExchange.publish(routingKey, message);
 }
 
 ////////////
@@ -88,9 +88,30 @@ module.exports.close = function(){
  * @param callback
  */
 module.exports.on = function (routingKey, callback){
-    queue.bind(registrationExchange, routingKey);
+    queue.bind(adminExchange, routingKey);
     listeners[routingKey] = callback;
     console.log('[BUS] Listening to', routingKey, 'messages');
+}
+
+/**
+ * Binds a listener to incoming bus messages for a limited period of time.
+ * @param routingKey
+ * @param callback
+ * @param timeoutCallback
+ * @param delay
+ */
+module.exports.onWithTimeout = function (routingKey, callback, timeoutCallback, delay){
+    var timeoutResponse = setTimeout(function(){
+        queue.unbind(adminExchange, routingKey);
+        delete listeners[routingKey];
+        console.log('[BUS] Stopped listening to', routingKey, 'messages');
+        return timeoutCallback();
+    }, delay);
+
+    module.exports.on(routingKey, function(message){
+        clearTimeout(timeoutResponse);
+        return callback(message);
+    });
 }
 
 
@@ -98,6 +119,13 @@ module.exports.on = function (routingKey, callback){
  * Publishes a message when a company tries to register
  */
 module.exports.publishRegister = function(company){
-    publish('website.register', { company: company });
+    publish('website.register', company);
+};
+
+/**
+ * Publishes a message to check company's key availability
+ */
+module.exports.publishCheck = function(key){
+    publish('website.check', { key: key });
 };
 

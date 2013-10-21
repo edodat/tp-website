@@ -31,6 +31,7 @@ require('./config/express.js')(app, express);
 ////////////
 
 app.post('/companies', controllers.companies.register);
+app.post('/companies/check', controllers.companies.checkKey);
 
 
 ///////////////////////////

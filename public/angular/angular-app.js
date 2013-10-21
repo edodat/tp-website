@@ -11,5 +11,11 @@ angular.module('app', ['ui.bootstrap', 'restangular'])
         RestangularProvider.setRestangularFields({
             id: '_id'
         });
+
+        RestangularProvider.addElementTransformer('companies', true, function(company) {
+            company.addRestangularMethod('check', 'post', 'check');
+            return company;
+        });
+
     })
 ;

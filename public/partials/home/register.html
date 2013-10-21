@@ -1,9 +1,17 @@
 <!-- Company Registration modal -->
 <div class="modal-header">
-    <h3>Register your company for free</h3>
+    <h3 class="row-fluid" >
+        <span class="span4 text-center" ng-class="{ muted: step!=1, 'text-info': step==1 }"><i class="icon-edit-sign"></i> Register</span>
+        <span class="span4 text-center" ng-class="{ muted: step!=2, 'text-info': step==2 }"><i class="icon-check-sign"></i> Activate</span>
+        <span class="span4 text-center" ng-class="{ muted: true }"><i class="icon-smile"></i> Finish</span>
+    </h3>
 </div>
 <div class="modal-body">
-    <form name="registrationForm" novalidate>
+    <!-- STEP 1: REGISTRATION -->
+    <form name="registrationForm" ng-show="step == 1" novalidate>
+        <div ng-show="error">
+            <alert type="'error'"><i class="icon-warning-sign"></i> {{ error }}</alert>
+        </div>
         <div class="control-group">
             <label for="name"><strong>Company details</strong></label>
             <input id="name" name="name" type="text" placeholder="Enter company name" ng-model="company.details.name" />
@@ -20,26 +28,40 @@
                 <input id="website" name="website" type="text" placeholder="Enter company website" ng-model="company.details.website" /><br>
             </div>
         </div>
-        <div class="control-group">
+        <div class="control-group" ng-class="{ error: registrationForm.email.$dirty && (registrationForm.email.$error.required || registrationForm.email.$error.email)} ">
             <label for="email"><strong>Contact information</strong></label>
             <input id="email" name="email" type="email" placeholder="Enter email address" ng-model="company.details.contact.email" required />
-            <span class="help-inline" ng-show="registrationForm.$dirty && registrationForm.email.$error.required">This field is required.</span>
-            <span class="help-block">Must be valid. No spam from us, promise.</span>
+            <span class="help-inline" ng-show="registrationForm.email.$error.required">This field is required.</span>
+            <span class="help-inline" ng-show="registrationForm.email.$error.email">Must be valid.</span>
+            <span class="help-block">No spam from us, promise.</span>
         </div>
-        <div class="control-group">
+        <div class="control-group" ng-class="{ success: isAvailable(company.key), error: isUnavailable(company.key), info: isChecking(company.key)}">
             <label for="key"><strong>Your private instance</strong></label>
             <div class="input-prepend input-append">
                 <span class="add-on">https://</span>
-                <input id="key" name="key" type="text" placeholder="e.g., universalexports" ng-model="company.key" ng-disabled="editionMode" required />
+                <input id="key" name="key" type="text" class="input-medium" placeholder="e.g., universalexports" ng-model="company.key" ng-change="checkKeyDelayed(company.key)" required />
                 <span class="add-on">.app.tp.com</span>
             </div>
-            <button class="btn btn-mini btn-info" ng-click="checkKey(company.key)">Check availability</button>
-            <span class="help-block" ng-show="checkedKeys[company.key].available">available</span>
-            <span class="help-block" ng-show="checkedKeys[company.key] && !checkedKeys[company.key].available">not available</span>
+            <span class="help-inline" ng-show="isChecking(company.key)"><i class="icon-spinner icon-spin"></i> Checking availability</span>
+            <span class="help-inline" ng-show="isAvailable(company.key)">Available</span>
+            <span class="help-inline" ng-show="isUnavailable(company.key)">Not available</span>
         </div>
     </form>
+    <!-- STEP 2: ACTIVATION -->
+    <div ng-show="step == 2">
+        <h4 class="text-success">Registration successful!</h4>
+        An email has been sent to <span class="text-info">{{ company.details.contact.email }}</span>.<br>
+        Please click on the <strong>activation link</strong> in this email to access your private instance.<br>
+        <br>
+        Thank you for registering to Lean Project,<br>
+        The Lean Project team
+    </div>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" ng-click="save()" ng-disabled="registrationForm.$invalid">Save</button>
-    <button class="btn btn-link" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-primary" ng-show="step == 1 && !registering" ng-click="register()" ng-disabled="registrationForm.$invalid || !isAvailable(company.key)">Continue</button>
+    <button class="btn btn-link" ng-show="step == 1 && !registering" ng-click="cancel()">Cancel</button>
+
+    <span ng-show="step == 1 && registering"><i ng-show="registering" class="icon-spinner icon-spin"></i> Registration in progress...</span>
+
+    <button class="btn btn-default" ng-show="step == 2" ng-click="close()">Close</button>
 </div>
