@@ -67,14 +67,14 @@ module.exports.admin = {
      * Calls ADMIN check WS
      */
     checkKeyAvailability : function(key, callback){
-        call(config.admin, '/companies/check', { key: key }, callback);
+        call(config.admin, '/ws/checkkey', { key: key }, callback);
     },
 
     /**
      * Calls ADMIN registration WS
      */
     register : function(company, callback){
-        call(config.admin, '/companies', company, callback);
+        call(config.admin, '/ws/register', company, callback);
     }
 
 };
