@@ -70,7 +70,7 @@ module.exports.notFound = function (res, message) {
  */
 module.exports.wrapup = function (res){
     return function(err, obj){
-        if (err) return Controller.error(res, err);
+        if (err) return module.exports.error(res, err);
         return module.exports.success(res, obj);
     }
 };

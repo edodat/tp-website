@@ -6,6 +6,7 @@ angular.module('app').controller('HomeCtrl', function($scope, $modal){
         $modal.open({
             templateUrl: 'partials/home/register.html',
             backdrop: 'static',
+            keyboard: false,
             controller: 'RegisterCompanyCtrl'
         });
     };
